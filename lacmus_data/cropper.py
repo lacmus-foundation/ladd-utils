@@ -9,12 +9,11 @@ import random
 import tempfile
 from typing import Optional, List, Callable
 
-import click
 import cv2
 import tqdm
 from joblib import Parallel, delayed
 
-from dataset import Annotation, Rectangle, LaddDataset, ImageIdType
+from lacmus_data.dataset import Annotation, Rectangle, LaddDataset, ImageIdType
 
 
 class GridFragment:
@@ -248,40 +247,3 @@ class DatasetGridCropper:
         val_set = ids[train_count:]
         test_set = val_set
         self.target_dataset.write_image_sets(train_set=train_set, val_set=val_set, test_set=test_set)
-
-
-@click.command()
-@click.option('--source-path', required=True, type=click.Path(exists=True),
-              help='Путь к исходному датасету в формате Pascal VOC')
-@click.option('--target-path', required=True, type=click.Path(),
-              help='Путь, по которому будет сформирован новый датасет')
-@click.option('--image-width', type=int, help='Ширина итоговых изображений (default 250)', default=250)
-@click.option('--image-height', type=int, help='Высота итоговых изображений (default 250)', default=250)
-@click.option('--overlap-width', type=int, help='Перехлест по горизонтали (default 125)', default=125)
-@click.option('--overlap-height', type=int, help='Перехлест по вертикали (default 125)', default=125)
-@click.option('--min-cropped-bbox-square', type=float, help='Минимальная площадь нового bbox по отношению к исходному (default 0.8)', default=0.8)
-def run_crop(source_path: click.Path,
-             target_path: click.Path,
-             image_width: int,
-             image_height: int,
-             overlap_width: int,
-             overlap_height: int,
-             min_cropped_bbox_square: int) -> None:
-    """Разрезание изображений из датасета и формирование нового датасета (формат Pascal VOC)"""
-    cropper = DatasetGridCropper(
-        source_dataset=LaddDataset(path=str(source_path)),
-        target_dataset=LaddDataset(path=str(target_path)),
-        image_cropper=ImageGridCropper(
-            window_w=image_width,
-            window_h=image_height,
-            overlap_w=overlap_width,
-            overlap_h=overlap_height,
-            min_cropped_bbox_square=min_cropped_bbox_square
-        ),
-        iter_callback=tqdm.tqdm
-    )
-    cropper.generate_dataset()
-
-
-if __name__ == '__main__':
-    run_crop()

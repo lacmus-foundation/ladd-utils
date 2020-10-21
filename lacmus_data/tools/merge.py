@@ -1,6 +1,6 @@
 from typing import List
 import random
-from dataset import Annotation, Rectangle, LaddDataset, ImageIdType
+from lacmus_data.dataset import Annotation, Rectangle, LaddDataset, ImageIdType
 import argparse
 
 def merge_datasets(input_pathes: List[str], output_path: str, include_test: bool = False):
@@ -62,8 +62,10 @@ def merge_datasets(input_pathes: List[str], output_path: str, include_test: bool
     
     print(f'dataset {output_path} created with {len(output_dataset.ids())} items.')
 
-def parse_args(args):
-    parser = argparse.ArgumentParser(description='merge datasets')
+def add_parser(subparser):
+    parser = subparser.add_parser(
+        "merge", help="merge lacmus deone datasets", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
     parser.add_argument(
         '-i', '--input',
         help='list of imput pathes, e.g. -i path1 path2 path3 ',
@@ -83,18 +85,14 @@ def parse_args(args):
         action='store_true',
         required=False
     )
-    return parser.parse_args(args)
+    parser.set_defaults(func=main)
 
-def main(args=None):
-    args=parse_args(args)
+def main(args):
     merge_datasets(
         input_pathes=args.input,
         output_path=args.output,
         include_test=args.include_test
     )
-
-if __name__ == '__main__':
-    main()
    
 
 
