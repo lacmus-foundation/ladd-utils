@@ -151,6 +151,33 @@ class LaddDataset:
     def ids(self) -> List[ImageIdType]:
         """Список ID изображений. По ID можно получить файл аннотаций или файл картинки"""
         return [f.stem for f in self.path.glob('Annotations/*.xml')]
+    
+    def train_test_val_ids(self):
+        train_filename = str(self.images_sets_dir() / 'train.txt')
+        train_set: List[ImageIdType] = []
+        lines = open(train_filename, 'r').readlines()
+        for line in lines:
+            line = line.replace('\n', '')
+            if line != '':
+                train_set.append(line)
+
+        val_filename = str(self.images_sets_dir() / 'val.txt')
+        val_set: List[ImageIdType] = []
+        lines = open(val_filename, 'r').readlines()
+        for line in lines:
+            line = line.replace('\n', '')
+            if line != '':
+                val_set.append(line)
+
+        test_filename = str(self.images_sets_dir() / 'test.txt')
+        test_set: List[ImageIdType] = []
+        lines = open(test_filename, 'r').readlines()
+        for line in lines:
+            line = line.replace('\n', '')
+            if line != '':
+                test_set.append(line)
+        
+        return train_set, test_set, val_set
 
     def image_filename(self, image_id: ImageIdType) -> str:
         """Файл, в котором хранится изображение"""
