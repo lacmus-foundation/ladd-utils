@@ -2,7 +2,8 @@ import argparse
 from lacmus_data.tools import (
     merge,
     crop,
-    visdrone2voc
+    visdrone2voc,
+    create
 )
 
 def add_parsers():
@@ -13,6 +14,7 @@ def add_parsers():
 
     merge.add_parser(subparser)
     crop.add_parser(subparser)
+    create.add_parser(subparser)
     visdrone2voc.add_parser(subparser)
 
     # We return the parsed arguments, but the sub-command parsers

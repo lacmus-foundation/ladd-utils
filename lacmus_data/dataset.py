@@ -7,7 +7,9 @@ import shutil
 import xml.etree.ElementTree as et
 from pathlib import Path
 from typing import List, Optional, NamedTuple
+import cv2
 
+ImageIdType = str  # тип для id изображения в датасете
 
 class Rectangle(NamedTuple):
     """Хранит координаты прямоугольника (xmin, ymin) - (xmax, ymax)"""
@@ -82,8 +84,11 @@ class AnnotationFileReader:
 class AnnotationFileWriter:
     """Запись аннотаций в файл"""
 
-    def __init__(self, filepath: str) -> None:
+    def __init__(self, filepath: str, img_path: str, id: ImageIdType) -> None:
         self.filepath = Path(filepath)
+        self.img_path = img_path
+        self.id = id
+
 
     def write(self, annotations: List[Annotation]) -> None:
         content = self._gen_file_content(annotations)
@@ -92,18 +97,21 @@ class AnnotationFileWriter:
     def _gen_file_content(self, boxes: List[Annotation]) -> str:
         boxes_content_list = [self._gen_bbox_content(box) for box in boxes]
         boxes_content_joined = ''.join(boxes_content_list)
+        img = cv2.imread(self.img_path)
+        height, width, channels = img.shape
+
         return (
             '<?xml version="1.0"?>\n'
             '<annotation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">\n'
             '  <folder>Unknown</folder>\n'
-            '  <filename>Unknown</filename>\n'
+            f'  <filename>{self.id}</filename>\n'
             '  <source>\n'
             '    <database>Unknown</database>\n'
             '  </source>\n'
             '  <size>\n'
-            '    <height></height>\n'
-            '    <width></width>\n'
-            '    <depth></depth>\n'
+            f'    <height>{height}</height>\n'
+            f'    <width>{width}</width>\n'
+            f'    <depth>{channels}</depth>\n'
             '  </size>\n'
             '  <segmented>0</segmented>\n'
             f'{boxes_content_joined}'
@@ -137,9 +145,6 @@ class ImageSetFileWriter:
         lines = [str(s) + '\n' for s in samples]
         content = ''.join(lines)
         self.filepath.write_text(content)
-
-
-ImageIdType = str  # тип для id изображения в датасете
 
 
 class LaddDataset:
@@ -203,7 +208,11 @@ class LaddDataset:
         shutil.copyfile(src=source_image_path, dst=image_filename)
 
         annotations_filename = self.annotations_filename(image_id)
-        writer = AnnotationFileWriter(filepath=annotations_filename)
+        writer = AnnotationFileWriter(
+            filepath=annotations_filename,
+            img_path=image_filename,
+            id=image_id
+        )
         writer.write(annotations=annotations)
 
     def remove(self, image_id: ImageIdType) -> None:
