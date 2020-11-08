@@ -3,7 +3,8 @@ from lacmus_data.tools import (
     merge,
     crop,
     visdrone2voc,
-    create
+    create,
+    resize
 )
 
 def add_parsers():
@@ -14,6 +15,7 @@ def add_parsers():
 
     merge.add_parser(subparser)
     crop.add_parser(subparser)
+    resize.add_parser(subparser)
     create.add_parser(subparser)
     visdrone2voc.add_parser(subparser)
 

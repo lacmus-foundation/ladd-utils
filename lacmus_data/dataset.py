@@ -205,7 +205,10 @@ class LaddDataset:
         self.annotations_dir().mkdir(parents=True, exist_ok=True)
 
         image_filename = self.image_filename(image_id)
-        shutil.copyfile(src=source_image_path, dst=image_filename)
+        try:
+            shutil.copyfile(src=source_image_path, dst=image_filename)
+        except shutil.SameFileError:
+            pass
 
         annotations_filename = self.annotations_filename(image_id)
         writer = AnnotationFileWriter(
