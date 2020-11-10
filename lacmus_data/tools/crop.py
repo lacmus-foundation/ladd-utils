@@ -2,6 +2,7 @@ from lacmus_data.cropper import DatasetGridCropper, ImageGridCropper
 from lacmus_data.dataset import LaddDataset
 import os
 import argparse
+import tqdm
 
 def run_crop(source_path: str,
              target_path: str,
@@ -23,7 +24,7 @@ def run_crop(source_path: str,
         ),
         iter_callback=tqdm.tqdm
     )
-    cropper.generate_dataset()
+    cropper.generate_dataset(prob=0.5)
 
 def add_parser(subparser):
     parser = subparser.add_parser(
