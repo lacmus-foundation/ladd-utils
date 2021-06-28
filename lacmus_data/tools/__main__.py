@@ -4,7 +4,8 @@ from lacmus_data.tools import (
     crop,
     visdrone2voc,
     create,
-    resize
+    resize,
+    voc2csv
 )
 
 def add_parsers():
@@ -18,6 +19,7 @@ def add_parsers():
     resize.add_parser(subparser)
     create.add_parser(subparser)
     visdrone2voc.add_parser(subparser)
+    voc2csv.add_parser(subparser)
 
     # We return the parsed arguments, but the sub-command parsers
     # are responsible for adding a function hook to their command.
